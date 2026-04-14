@@ -230,7 +230,13 @@ function save_thumbnail(string $sourcePath, string $thumbPath, int $maxWidth = 4
         return false;
     }
 
-    [$width, $height, , $mime] = $info;
+    $width = (int) ($info[0] ?? 0);
+    $height = (int) ($info[1] ?? 0);
+    $mime = (string) ($info['mime'] ?? '');
+    if ($width <= 0 || $height <= 0 || $mime === '') {
+        return false;
+    }
+
     $source = image_create_from_file($sourcePath, $mime);
     if (!$source) {
         return false;
@@ -308,4 +314,42 @@ function delete_file_if_exists(?string $relativePath): void
     if (is_file($absolute)) {
         @unlink($absolute);
     }
+}
+
+function ensure_thumbnail_for_memo(PDO $pdo, array $memo): string
+{
+    $imagePath = trim((string) ($memo['image_path'] ?? ''));
+    $thumbPath = trim((string) ($memo['thumbnail_path'] ?? ''));
+
+    if ($imagePath === '') {
+        return '';
+    }
+
+    $absoluteImage = __DIR__ . DIRECTORY_SEPARATOR . $imagePath;
+    if (!is_file($absoluteImage)) {
+        return $thumbPath !== '' ? $thumbPath : $imagePath;
+    }
+
+    if ($thumbPath === '') {
+        $basename = pathinfo($imagePath, PATHINFO_FILENAME);
+        $thumbPath = 'uploads/thumbs/' . $basename . '_thumb.jpg';
+    }
+
+    $absoluteThumb = __DIR__ . DIRECTORY_SEPARATOR . $thumbPath;
+    if (!is_file($absoluteThumb)) {
+        ensure_upload_dirs();
+        if (!save_thumbnail($absoluteImage, $absoluteThumb)) {
+            return $imagePath;
+        }
+    }
+
+    if (($memo['thumbnail_path'] ?? '') !== $thumbPath && !empty($memo['memo_id'])) {
+        $stmt = $pdo->prepare('UPDATE dbmemo SET thumbnail_path = :thumbnail_path WHERE memo_id = :memo_id');
+        $stmt->execute([
+            'thumbnail_path' => $thumbPath,
+            'memo_id' => (int) $memo['memo_id'],
+        ]);
+    }
+
+    return $thumbPath;
 }

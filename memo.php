@@ -110,7 +110,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-$memos = $pdo->query('SELECT m.*, u.nickname, u.account FROM dbmemo m INNER JOIN dbusers u ON u.user_id = m.creator_id WHERE m.is_deleted = 0 ORDER BY m.created_at DESC, m.memo_id DESC')->fetchAll();
+$stmt = $pdo->prepare('SELECT m.*, u.nickname, u.account FROM dbmemo m INNER JOIN dbusers u ON u.user_id = m.creator_id WHERE m.is_deleted = 0 AND m.creator_id = :creator_id ORDER BY m.created_at DESC, m.memo_id DESC');
+$stmt->execute(['creator_id' => $user['user_id']]);
+$memos = $stmt->fetchAll();
 
 render_header('生活備忘', 'memo');
 ?>
@@ -149,8 +151,8 @@ render_header('生活備忘', 'memo');
 <section class="section-box">
     <div class="section-head">
         <div>
-            <h2>所有生活記錄</h2>
-            <p>這裡可查看、修改與刪除所有已公開的備忘。</p>
+            <h2>我的生活記錄</h2>
+            <p>這裡只會顯示你自己新增的備忘，可進行查看、修改與刪除。</p>
         </div>
     </div>
 
@@ -159,8 +161,9 @@ render_header('生活備忘', 'memo');
     <?php else: ?>
         <div class="memo-grid">
             <?php foreach ($memos as $memo): ?>
+                <?php $displayThumb = ensure_thumbnail_for_memo($pdo, $memo); ?>
                 <article class="memo-card">
-                    <img class="memo-thumb" src="<?= e($memo['thumbnail_path']) ?>" alt="<?= e($memo['title']) ?>">
+                    <img class="memo-thumb" src="<?= e($displayThumb) ?>" alt="<?= e($memo['title']) ?>">
                     <div class="memo-body">
                         <div class="memo-meta">作者：<?= e($memo['nickname']) ?> (<?= e($memo['account']) ?>) · <?= e($memo['created_at']) ?></div>
                         <h3><?= e($memo['title']) ?></h3>

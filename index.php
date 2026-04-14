@@ -2,12 +2,19 @@
 require __DIR__ . '/db.php';
 
 $pdo = db();
+$user = current_user();
 
 $userCount = (int) $pdo->query('SELECT COUNT(*) AS total FROM dbusers')->fetch()['total'];
 $memoCount = (int) $pdo->query('SELECT COUNT(*) AS total FROM dbmemo WHERE is_deleted = 0')->fetch()['total'];
 $logCount = (int) $pdo->query('SELECT COUNT(*) AS total FROM dblog')->fetch()['total'];
 
-$recentMemos = $pdo->query('SELECT m.memo_id, m.title, m.content, m.image_path, m.thumbnail_path, m.created_at, u.nickname, u.account FROM dbmemo m INNER JOIN dbusers u ON u.user_id = m.creator_id WHERE m.is_deleted = 0 ORDER BY m.created_at DESC, m.memo_id DESC LIMIT 6')->fetchAll();
+if ($user) {
+    $recentStmt = $pdo->prepare('SELECT m.memo_id, m.title, m.content, m.image_path, m.thumbnail_path, m.created_at, u.nickname, u.account FROM dbmemo m INNER JOIN dbusers u ON u.user_id = m.creator_id WHERE m.is_deleted = 0 AND m.creator_id = :creator_id ORDER BY m.created_at DESC, m.memo_id DESC LIMIT 6');
+    $recentStmt->execute(['creator_id' => $user['user_id']]);
+    $recentMemos = $recentStmt->fetchAll();
+} else {
+    $recentMemos = [];
+}
 
 render_header('日常圖文記錄站', 'home');
 ?>
@@ -59,7 +66,7 @@ render_header('日常圖文記錄站', 'home');
     <div class="section-head">
         <div>
             <h2>最新生活記錄</h2>
-            <p>這裡會顯示最近新增的圖文備忘。</p>
+            <p><?= $user ? '這裡只會顯示你最近新增的圖文備忘。' : '請先登入後查看你的圖文備忘。' ?></p>
         </div>
         <a class="btn" href="memo.php">新增備忘</a>
     </div>
