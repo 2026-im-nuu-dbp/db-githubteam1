@@ -5,9 +5,9 @@
     --text: #18212f;
     --muted: #607085;
     --line: rgba(24, 33, 47, 0.12);
-    --accent: #0f766e;
-    --accent-2: #d97706;
-    --danger: #c2410c;
+    --accent: #716ec6;
+    --accent-2: #068fd9;
+    --danger: #c05d98;
     --shadow: 0 18px 50px rgba(17, 24, 39, 0.12);
 }
 
@@ -134,7 +134,7 @@ a {
 
 .hero-card {
     padding: 30px;
-    background: linear-gradient(135deg, rgba(15, 118, 110, 0.96), rgba(8, 145, 178, 0.82));
+    background: linear-gradient(135deg, rgba(228, 120, 197, 0.96), rgba(171, 105, 215, 0.82));
     color: white;
 }
 
@@ -218,11 +218,11 @@ a {
 }
 
 .flash.success {
-    background: rgba(16, 185, 129, 0.14);
+    background: rgba(243, 135, 223, 0.419);
 }
 
 .flash.error {
-    background: rgba(239, 68, 68, 0.12);
+    background: rgba(52, 41, 105, 0.12);
 }
 
 .form-grid {
@@ -335,7 +335,7 @@ th {
 }
 
 .danger {
-    background: #b45309;
+    background: #387f9f;
 }
 
 .inline-form {
