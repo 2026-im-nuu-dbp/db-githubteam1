@@ -12,7 +12,7 @@
 ## 2. 使用 Laragon 管理資料庫 (PHPMyadmin)
 
 1. 在工具中打開 PHPMyadmin
-2. 新增資料庫，命名為 test_db
+2. 新增資料庫，命名為 db_a01
 
 ## 3. 核心 SQL 語法 (CRUD)
 
@@ -44,12 +44,12 @@ INSERT INTO users (username, email) VALUES ('Alex', 'alex@example.com');
 
 在現代 PHP 開發中，我們使用 **PDO (PHP Data Objects)**。它比舊式的 mysqli 更安全，能有效防止 SQL 注入攻擊。
 
-請在 www 資料夾下建立 `db_test.php`，並填入以下內容（請確保你已建立 test_db）：
+請在 www 資料夾下建立 `db_test.php`，並填入以下內容（請確保你已建立 db_a01）：
 
 ```php
 <?php
 $host = '127.0.0.1';
-$db   = 'test_db';
+$db   = 'db_a01';
 $user = 'root';
 $pass = ''; // Laragon 預設密碼為空
 $charset = 'utf8mb4';
